@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Infografis Interaktif: Fungi (Jamur)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#111833; --text:#eaf0ff; --muted:#99a2c7; --accent:#7be0b5; --accent-2:#8ab6ff; --danger:#ff7b9c;
+      --ring: rgba(123,224,181,.5);
+    }
+    [data-theme="light"]{
+      --bg:#f6f7fb; --card:#ffffff; --text:#1b2340; --muted:#5a688d; --accent:#0d9488; --accent-2:#2563eb; --danger:#be123c; --ring: rgba(37,99,235,.25);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:linear-gradient(180deg,var(--bg),#080c1b 60%,var(--bg)); color:var(--text)}
+    header{position:sticky;top:0;z-index:30;backdrop-filter:saturate(150%) blur(6px); background:linear-gradient(90deg,rgba(12,18,40,.75),rgba(12,18,40,.2)); border-bottom:1px solid rgba(255,255,255,.06)}
+    .container{max-width:1100px;margin:auto;padding:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:40px;height:40px;border-radius:12px;background:conic-gradient(from 180deg at 50% 50%, var(--accent), var(--accent-2), var(--accent)); box-shadow:0 8px 24px -8px var(--ring)}
+    h1{font-size:clamp(22px,2.6vw,34px);margin:0}
+    .muted{color:var(--muted)}
+    .chipbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .chip{padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;cursor:pointer;user-select:none;transition:.2s;background:rgba(255,255,255,.02)}
+    .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-color:transparent;box-shadow:0 6px 20px -10px var(--ring)}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);padding:18px;border-radius:16px; box-shadow:0 10px 30px -15px rgba(0,0,0,.5)}
+    .title{font-weight:700;margin:0 0 6px}
+    .sub{margin:0 0 12px;color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    button, .btn{cursor:pointer;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:none;padding:10px 14px;border-radius:12px;font-weight:600; box-shadow:0 10px 22px -12px var(--ring)}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--text)}
+    .switch{display:inline-flex;align-items:center;gap:8px}
+    .switch input{appearance:none;width:42px;height:24px;background:#2a3253;border-radius:30px;position:relative;outline:2px solid transparent;outline-offset:2px;transition:.2s}
+    .switch input:checked{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .switch input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s}
+    .switch input:checked::after{left:21px}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;background:#0f172a;color:#cbd5e1;padding:2px 6px;border-radius:6px;border:1px solid rgba(255,255,255,.1)}
+
+    /* Anatomy SVG */
+    .anatomy{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    .svgwrap{background:radial-gradient(1200px 400px at 30% 40%, rgba(139,199,255,.08), transparent),
+              radial-gradient(900px 300px at 80% 60%, rgba(123,224,181,.08), transparent); border-radius:14px; border:1px dashed rgba(255,255,255,.08); padding:8px}
+    .label{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:4px 8px;border-radius:10px}
+    .dot{width:8px;height:8px;border-radius:99px}
+    .legend{display:flex;flex-wrap:wrap;gap:8px}
+    .tip{font-size:14px;color:var(--muted)}
+
+    /* Lifecycle */
+    .steps{display:flex;gap:10px;flex-wrap:wrap}
+    .step{flex:1;min-width:200px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:12px;border-radius:12px;position:relative}
+    .step.active{outline:2px solid var(--accent-2)}
+
+    /* Cards list with filters */
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .tag{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);cursor:pointer}
+    .tag.active{background:rgba(139,199,255,.12);border-color:var(--accent-2)}
+    .list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+    /* Simple bar chart */
+    .bars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:160px;margin-top:14px}
+    .bar{background:linear-gradient(180deg,var(--accent-2),var(--accent));border-radius:10px 10px 6px 6px; position:relative}
+    .bar span{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-6px);font-size:12px;background:rgba(0,0,0,.35);padding:2px 6px;border-radius:6px}
+
+    /* Quiz */
+    .quiz-q{font-weight:700}
+    .opt{display:block;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:10px;margin-top:8px;cursor:pointer}
+    .opt.correct{border-color:var(--accent)}
+    .opt.wrong{border-color:var(--danger)}
+
+    /* Glossary */
+    .search{display:flex;gap:8px}
+    input[type="search"], input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--text)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    td,th{padding:10px 12px;text-align:left}
+    tbody tr{background:rgba(255,255,255,.03)}
+    tbody tr:hover{outline:1px solid rgba(255,255,255,.12)}
+
+    footer{opacity:.8;margin:30px 0 60px}
+    a{color:var(--accent-2)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container row" style="justify-content:space-between">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Infografis Interaktif: Dunia Fungi (Jamur)</h1>
+          <div class="muted">Struktur • Siklus Hidup • Peran Ekologi • Keanekaragaman • Kuis • Glosarium</div>
+        </div>
+      </div>
+      <label class="switch" title="Tema Gelap/Terang">
+        <span class="muted">Tema</span>
+        <input id="themeToggle" type="checkbox" />
+      </label>
+    </div>
+  </header>
+
+  <main class="container" id="app">
+    <!-- Chip Navigation -->
+    <nav class="chipbar" id="navChips" aria-label="Bagian halaman">
+      <span class="chip active" data-target="#anatomy">Struktur Jamur</span>
+      <span class="chip" data-target="#lifecycle">Siklus Hidup</span>
+      <span class="chip" data-target="#roles">Peran Ekologi</span>
+      <span class="chip" data-target="#diversity">Keanekaragaman</span>
+      <span class="chip" data-target="#facts">Fakta Cepat</span>
+      <span class="chip" data-target="#quiz">Kuis</span>
+      <span class="chip" data-target="#glossary">Glosarium</span>
+    </nav>
+
+    <!-- Anatomy Section -->
+    <section id="anatomy" class="card anatomy" aria-label="Struktur tubuh jamur bertipe tubuh buah (mushroom)">
+      <div class="svgwrap">
+        <!-- Simplified mushroom SVG with interactive hotspots -->
+        <svg id="mushroomSVG" viewBox="0 0 600 420" width="100%" role="img" aria-labelledby="svgTitle svgDesc">
+          <title id="svgTitle">Anatomi Jamur Payung</title>
+          <desc id="svgDesc">Klik bagian jamur untuk melihat penjelasan</desc>
+          <defs>
+            <radialGradient id="capGrad" cx="50%" cy="30%" r="60%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity=".3"/>
+              <stop offset="100%" stop-color="var(--accent-2)" stop-opacity=".9"/>
+            </radialGradient>
+          </defs>
+          <!-- Cap -->
+          <path data-part="Tudung (Cap)" data-info="Struktur pelindung di atas yang melindungi bilah/pori dan menyebarkan spora." d="M80,180 C180,40 420,40 520,180 Q300,240 80,180" fill="url(#capGrad)" stroke="rgba(255,255,255,.6)"/>
+          <!-- Gills -->
+          <g data-part="Bilah (Gills)" data-info="Lembaran tipis di bawah tudung tempat pembentukan spora (basidiospora/askospora)." fill="rgba(255,255,255,.5)">
+            <path d="M120,190 Q300,230 480,190"/>
+            <path d="M120,200 Q300,240 480,200"/>
+            <path d="M120,210 Q300,250 480,210"/>
+            <path d="M120,220 Q300,260 480,220"/>
+          </g>
+          <!-- Stipe -->
+          <rect data-part="Tangkai (Stipe)" data-info="Menopang tudung dan mengangkat struktur penyebar spora dari permukaan tanah." x="280" y="200" width="40" height="170" rx="18" fill="rgba(255,255,255,.75)" stroke="rgba(255,255,255,.6)"/>
+          <!-- Ring -->
+          <ellipse data-part="Cincin (Annulus)" data-info="Sisa selubung parsial; tidak semua jamur memilikinya." cx="300" cy="240" rx="70" ry="14" fill="rgba(255,255,255,.3)"/>
+          <!-- Hyphae & Mycelium -->
+          <g data-part="Miselium (Jaringan Hifa)" data-info="Jaringan benang halus (hifa) di substrat; bagian utama jamur yang menyerap nutrisi.">
+            <path d="M70,380 Q120,350 160,370 T240,360 T330,380 T420,360 T520,380" fill="none" stroke="rgba(123,224,181,.8)" stroke-width="3"/>
+            <path d="M160,370 q10,-20 30,0 m10,0 q12,-18 26,0 m40,0 q14,-22 28,0 m40,0 q12,-18 26,0" fill="none" stroke="rgba(123,224,181,.6)"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <h2 class="title">Struktur Jamur</h2>
+        <p class="sub">Klik bagian pada ilustrasi untuk sorot & baca penjelasan. Gunakan <span class="kbd">Tab</span> untuk fokus tiap elemen.</p>
+        <div class="legend" id="legend"></div>
+        <p class="tip" id="anatomyInfo">Tip: Mulai dengan mengklik <b>Tudung</b> untuk melihat fungsinya.</p>
+      </div>
+    </section>
+
+    <!-- Lifecycle Section -->
+    <section id="lifecycle" class="card">
+      <h2 class="title">Siklus Hidup Umum Fungi</h2>
+      <p class="sub">Bervariasi antar kelompok, namun pola umumnya meliputi pembentukan spora, perkecambahan, pembentukan miselium, dan reproduksi seksual/aseksual.</p>
+      <div class="steps" id="lifeSteps"></div>
+      <div class="row" style="justify-content:space-between;margin-top:10px">
+        <button id="prevStep" class="ghost" aria-label="Langkah sebelumnya">◀ Sebelumnya</button>
+        <div class="muted">Gunakan tombol atau <span class="kbd">←</span><span class="kbd">→</span></div>
+        <button id="nextStep" aria-label="Langkah berikutnya">Berikutnya ▶</button>
+      </div>
+    </section>
+
+    <!-- Roles Section -->
+    <section id="roles" class="card">
+      <h2 class="title">Peran Ekologi</h2>
+      <p class="sub">Fungi sangat penting dalam ekosistem dan kehidupan manusia.</p>
+      <div class="filters" id="roleFilters"></div>
+      <div class="list" id="roleList"></div>
+    </section>
+
+    <!-- Diversity Section -->
+    <section id="diversity" class="card grid cols-2">
+      <div>
+        <h2 class="title">Keanekaragaman Fungi</h2>
+        <p class="sub">Beberapa filum utama dan contohnya.</p>
+        <div id="divList" class="list"></div>
+      </div>
+      <div>
+        <h3 class="title">Perbandingan Sederhana (diagram batang)</h3>
+        <p class="sub">Ilustrasi perbandingan <em>perkiraan relatif</em> keragaman kelompok yang umum dibahas di kelas. Bukan data sensus.</p>
+        <div class="bars" id="barChart" role="img" aria-label="Diagram batang perbandingan relatif kelompok fungi"></div>
+      </div>
+    </section>
+
+    <!-- Fast Facts -->
+    <section id="facts" class="card grid cols-3">
+      <div>
+        <h2 class="title">Fakta Cepat</h2>
+        <ul>
+          <li>Jamur bukan tumbuhan; mereka punya dinding sel dari <b>kitin</b>, bukan selulosa.</li>
+          <li>Miselium bisa membentuk jaringan sangat luas di tanah hutan.</li>
+          <li>Banyak fungi bersimbiosis dengan akar tanaman: <b>mikorriza</b>.</li>
+          <li>Fungi menghasilkan antibiotik (mis. penisilin), pangan (roti, tempe), hingga enzim industri.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="title">Coba Ini</h3>
+        <p>Letakkan seiris jamur di atas kertas gelap semalam untuk melihat <b>cetak spora</b> (spore print) — pola dan warna spora akan terlihat.</p>
+      </div>
+      <div>
+        <h3 class="title">Keamanan</h3>
+        <p class="sub">Jangan memakan jamur liar tanpa identifikasi ahli. Banyak spesies beracun mirip dengan yang dapat dimakan.</p>
+      </div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="quiz" class="card">
+      <h2 class="title">Kuis Kilat: Kenali Fungi</h2>
+      <div id="quizBox"></div>
+      <div class="row" style="margin-top:10px">
+        <button id="resetQuiz" class="ghost">Reset</button>
+        <span class="muted" id="quizScore">Skor: 0/0</span>
+      </div>
+    </section>
+
+    <!-- Glossary -->
+    <section id="glossary" class="card">
+      <h2 class="title">Glosarium Mini</h2>
+      <div class="search">
+        <input type="search" id="searchBox" placeholder="Cari istilah (misal: miselium, hifa, askus)" aria-label="Cari istilah"/>
+        <button id="clearSearch" class="ghost">Bersihkan</button>
+      </div>
+      <div style="overflow:auto;margin-top:10px">
+        <table aria-label="Tabel glosarium">
+          <thead><tr><th>Istilah</th><th>Arti Singkat</th></tr></thead>
+          <tbody id="glossBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="muted">
+      Dibuat untuk pembelajaran sains olehmu ✨ • Mode: <span id="modeLabel">Gelap</span> • Tekan <span class="kbd">/</span> untuk fokus ke pencarian glosarium.
+    </footer>
+  </main>
+
+  <script>
+    // ===== Tema =====
+    const themeToggle = document.getElementById('themeToggle');
+    const modeLabel = document.getElementById('modeLabel');
+    const savedTheme = localStorage.getItem('fungi-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme==='dark'? '': 'light');
+    themeToggle.checked = savedTheme!=='dark';
+    modeLabel.textContent = savedTheme==='dark'? 'Gelap' : 'Terang';
+    themeToggle.addEventListener('change',()=>{
+      const light = themeToggle.checked;
+      document.documentElement.setAttribute('data-theme', light? 'light' : '');
+      localStorage.setItem('fungi-theme', light? 'light':'dark');
+      modeLabel.textContent = light? 'Terang':'Gelap';
+    });
+
+    // ===== Navigasi chip ke anchor =====
+    document.querySelectorAll('.chip').forEach(ch=>{
+      ch.addEventListener('click',()=>{
+        document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+        ch.classList.add('active');
+        const target = document.querySelector(ch.dataset.target);
+        target?.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+
+    // ===== Anatomy interaktif =====
+    const svg = document.getElementById('mushroomSVG');
+    const info = document.getElementById('anatomyInfo');
+    const legend = document.getElementById('legend');
+
+    function addLegend(part, color){
+      const el = document.createElement('span');
+      el.className = 'label';
+      el.innerHTML = `<span class="dot" style="background:${color}"></span>${part}`;
+      legend.appendChild(el);
+    }
+
+    [...svg.querySelectorAll('[data-part]')].forEach((el, idx)=>{
+      const color = idx%2? 'var(--accent-2)':'var(--accent)';
+      el.style.outline = 'none';
+      el.setAttribute('tabindex','0');
+      el.addEventListener('mouseenter',()=> el.style.filter='drop-shadow(0 0 8px var(--ring))');
+      el.addEventListener('mouseleave',()=> el.style.filter='');
+      el.addEventListener('click',()=> selectPart(el, color));
+      el.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); selectPart(el, color);} });
+      addLegend(el.dataset.part, color);
+    });
+
+    function selectPart(el, color){
+      svg.querySelectorAll('[data-part]').forEach(n=> n.style.strokeWidth='1');
+      el.style.strokeWidth = '3';
+      info.innerHTML = `<b>${el.dataset.part}:</b> ${el.dataset.info}`;
+    }
+
+    // ===== Siklus hidup =====
+    const steps = [
+      {title:'Spora', txt:'Unit reproduksi mikroskopis yang tahan lingkungan, tersebar oleh angin/air/hewan.'},
+      {title:'Perkecambahan', txt:'Spora tumbuh menjadi hifa saat kondisi sesuai (air, nutrien, suhu).'},
+      {title:'Miselium', txt:'Jaringan hifa menyebar dalam substrat, menyerap nutrisi secara osmotik.'},
+      {title:'Pembentukan Tubuh Buah', txt:'Pada sebagian jamur, miselium membentuk struktur makroskopis (mushroom) untuk produksi spora.'},
+      {title:'Reproduksi Seksual/Aseksual', txt:'Fusi hifa/inti (seksual) atau pembentukan spora aseksual (konidia), lalu kembali ke spora.'}
+    ];
+    const stepsWrap = document.getElementById('lifeSteps');
+    const prevBtn = document.getElementById('prevStep');
+    const nextBtn = document.getElementById('nextStep');
+    let stepIndex = 0;
+
+    function renderSteps(){
+      stepsWrap.innerHTML = steps.map((s,i)=>`
+        <div class="step ${i===stepIndex? 'active':''}">
+          <div class="muted">Langkah ${i+1}/${steps.length}</div>
+          <div style="font-weight:700">${s.title}</div>
+          <div>${s.txt}</div>
+        </div>
+      `).join('');
+    }
+    renderSteps();
+    function setStep(i){ stepIndex = (i+steps.length)%steps.length; renderSteps(); }
+    prevBtn.onclick = ()=> setStep(stepIndex-1);
+    nextBtn.onclick = ()=> setStep(stepIndex+1);
+    window.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') prevBtn.click(); if(e.key==='ArrowRight') nextBtn.click(); });
+
+    // ===== Peran Ekologi (filterable cards) =====
+    const roles = [
+      {type:'Dekomposer', title:'Pengurai Kayu & Serasah', desc:'Menguraikan lignin & selulosa, mendaur ulang unsur hara.', tags:['ekosistem','hutan']},
+      {type:'Mutualis', title:'Mikorriza', desc:'Bersimbiosis dengan akar tumbuhan, meningkatkan penyerapan mineral.', tags:['tanaman','pertanian']},
+      {type:'Patogen', title:'Karat & Embun Tepung', desc:'Menyebabkan penyakit pada tanaman; dapat menurunkan hasil panen.', tags:['tanaman','patogen']},
+      {type:'Patogen', title:'Mikosis pada Manusia', desc:'Panu, kurap, kandidiasis; biasanya oportunistik.', tags:['kesehatan']},
+      {type:'Industri', title:'Fermentasi', desc:'Ragi untuk roti & minuman; kapang untuk tempe/keju.', tags:['pangan','industri']},
+      {type:'Biotek', title:'Antibiotik & Enzim', desc:'Sumber senyawa bioaktif & enzim industri.', tags:['biotek','kesehatan']}
+    ];
+    const cats = [...new Set(roles.map(r=>r.type))];
+    const roleFilters = document.getElementById('roleFilters');
+    const roleList = document.getElementById('roleList');
+    let activeCat = 'Semua';
+
+    roleFilters.innerHTML = ['Semua',...cats].map(c=> `<span class="tag ${c==='Semua'?'active':''}" data-cat="${c}">${c}</span>`).join('');
+    function renderRoles(){
+      roleList.innerHTML = roles
+        .filter(r => activeCat==='Semua' || r.type===activeCat)
+        .map(r=> `
+          <div class="card">
+            <div class="muted">${r.type}</div>
+            <div style="font-weight:700">${r.title}</div>
+            <div>${r.desc}</div>
+            <div class="muted" style="margin-top:6px">#${r.tags.join(' #')}</div>
+          </div>
+        `).join('');
+    }
+    renderRoles();
+    roleFilters.querySelectorAll('.tag').forEach(t=> t.addEventListener('click',()=>{
+      roleFilters.querySelectorAll('.tag').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      activeCat = t.dataset.cat;
+      renderRoles();
+    }));
+
+    // ===== Keanekaragaman + Bar chart =====
+    const groups = [
+      {name:'Ascomycota', note:'Ragi, morel, kapang; banyak spesies pembentuk konidia.' , rel: 5},
+      {name:'Basidiomycota', note:'Jamur payung, puffball, karat & jelaga.' , rel: 4},
+      {name:'Mucoromycota', note:'Dulu disebut Zygomycota; kapang roti.', rel: 2},
+      {name:'Chytridiomycota', note:'Fungi berflagel (chytrid).', rel: 1},
+      {name:'Glomeromycota', note:'Pembentuk mikorriza arbuskula.', rel: 1}
+    ];
+    const divList = document.getElementById('divList');
+    divList.innerHTML = groups.map(g=>`
+      <div class="card">
+        <div style="font-weight:700">${g.name}</div>
+        <div class="muted">${g.note}</div>
+      </div>
+    `).join('');
+
+    const barChart = document.getElementById('barChart');
+    const maxRel = Math.max(...groups.map(g=>g.rel));
+    barChart.innerHTML = groups.map(g=>{
+      const h = 30 + (g.rel/maxRel)*110; // min 30
+      return `<div class="bar" style="height:${h}px"><span>${g.name}</span></div>`;
+    }).join('');
+
+    // ===== Kuis =====
+    const questions = [
+      {q:'Bahan utama dinding sel jamur adalah...', opts:['Kitin','Selulosa','Keratin'], ans:0},
+      {q:'Struktur utama penyerap nutrisi pada jamur adalah...', opts:['Tudung','Hifa/Miselium','Spora'], ans:1},
+      {q:'Hubungan saling menguntungkan jamur-akar disebut...', opts:['Liken','Miselium','Mikorriza'], ans:2},
+      {q:'Unit reproduksi yang umumnya tersebar angin/air/hewan...', opts:['Biji','Spora','Konidiosom'], ans:1},
+    ];
+    const quizBox = document.getElementById('quizBox');
+    const quizScore = document.getElementById('quizScore');
+    const resetQuiz = document.getElementById('resetQuiz');
+    let correct = 0, attempted = 0;
+
+    function renderQuiz(){
+      quizBox.innerHTML = questions.map((it,qi)=>{
+        return `<div class="card" style="margin:10px 0">
+          <div class="quiz-q">${qi+1}. ${it.q}</div>
+          ${it.opts.map((o,oi)=>`<label class="opt" data-qi="${qi}" data-oi="${oi}">${o}</label>`).join('')}
+        </div>`
+      }).join('');
+      quizScore.textContent = `Skor: ${correct}/${attempted}`;
+      quizBox.querySelectorAll('.opt').forEach(el=> el.addEventListener('click',()=>{
+        const qi = +el.dataset.qi; const oi = +el.dataset.oi;
+        const isCorrect = oi===questions[qi].ans;
+        if(!el.parentElement.dataset.done){
+          attempted++; if(isCorrect) correct++;
+          [...el.parentNode.querySelectorAll('.opt')].forEach(x=> x.classList.add('wrong'));
+          el.classList.remove('wrong');
+          el.classList.add(isCorrect? 'correct':'wrong');
+          el.parentElement.dataset.done = '1';
+          quizScore.textContent = `Skor: ${correct}/${attempted}`;
+        }
+      }));
+    }
+    renderQuiz();
+    resetQuiz.addEventListener('click',()=>{correct=0;attempted=0;renderQuiz();});
+
+    // ===== Glosarium =====
+    const glossary = [
+      ['Hifa','Benang penyusun tubuh jamur.'],
+      ['Miselium','Jaringan hifa di substrat.'],
+      ['Tudung (Cap)','Bagian atas tubuh buah jamur payung.'],
+      ['Bilah (Gills)','Lembaran di bawah tudung tempat spora terbentuk.'],
+      ['Stipe (Tangkai)','Batang yang menopang tudung.'],
+      ['Spora','Unit reproduksi jamur.'],
+      ['Askus','Kantung pembentuk askospora (Ascomycota).'],
+      ['Basidium','Sel penghasil basidiospora (Basidiomycota).'],
+      ['Mikorriza','Simbiosis jamur-akar tumbuhan.'],
+      ['Liken','Simbiosis jamur dengan alga/sianobakteri.'],
+      ['Konidia','Spora aseksual pada banyak ascomycota.'],
+      ['Saprofit','Menguraikan bahan organik mati.'],
+    ];
+    const glossBody = document.getElementById('glossBody');
+    function renderGlossary(filter=''){
+      const f = filter.trim().toLowerCase();
+      const rows = glossary.filter(([term])=> term.toLowerCase().includes(f) );
+      glossBody.innerHTML = rows.map(([term,def])=> `<tr><td><b>${term}</b></td><td>${def}</td></tr>`).join('');
+    }
+    renderGlossary();
+
+    const search = document.getElementById('searchBox');
+    const clear = document.getElementById('clearSearch');
+    search.addEventListener('input',()=> renderGlossary(search.value));
+    clear.addEventListener('click',()=>{ search.value=''; renderGlossary(''); search.focus(); });
+    window.addEventListener('keydown',e=>{ if(e.key==='/'){ e.preventDefault(); search.focus(); } });
+  </script>
+</body>
+</html>
